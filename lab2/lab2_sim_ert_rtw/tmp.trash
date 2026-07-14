@@ -1,0 +1,9 @@
+
+avrdude: AVR device initialized and ready to accept instructions
+avrdude: Device signature = 0x1e9801 (probably m2560)
+avrdude: reading input file "C:\Users\tsd7\Desktop\potato/lab2_sim.hex"
+avrdude: writing flash (27038 bytes):
+avrdude: 27038 bytes of flash written
+
+avrdude done.  Thank you.
+

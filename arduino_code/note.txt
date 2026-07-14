@@ -1,0 +1,5 @@
+Use this command to view the log:
+  pio device monitor -b 115200
+
+Upload the code:
+  pio device monitor -b 115200 run -e megaatmega2560 -t upload

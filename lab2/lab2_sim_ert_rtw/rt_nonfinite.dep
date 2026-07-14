@@ -1,0 +1,14 @@
+rt_nonfinite.o: \
+ C:/Users/tsd7/Desktop/potato/lab2_sim_ert_rtw/rt_nonfinite.c \
+ C:/Users/tsd7/Desktop/potato/lab2_sim_ert_rtw/rtGetNaN.h \
+ C:/Users/tsd7/Desktop/potato/lab2_sim_ert_rtw/rt_nonfinite.h \
+ C:/Users/tsd7/Desktop/potato/lab2_sim_ert_rtw/rtwtypes.h \
+ C:/Users/tsd7/Desktop/potato/lab2_sim_ert_rtw/rtGetInf.h
+
+C:/Users/tsd7/Desktop/potato/lab2_sim_ert_rtw/rtGetNaN.h:
+
+C:/Users/tsd7/Desktop/potato/lab2_sim_ert_rtw/rt_nonfinite.h:
+
+C:/Users/tsd7/Desktop/potato/lab2_sim_ert_rtw/rtwtypes.h:
+
+C:/Users/tsd7/Desktop/potato/lab2_sim_ert_rtw/rtGetInf.h:
