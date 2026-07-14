@@ -23,10 +23,7 @@ addpath([fileparts(mfilename('fullpath')) '\RASPlib'],...
 %  fine here -- MATLAB does the dimming. Re-upload the .hex to get it back.
 % ==========================================================================
 
-% Connect. The rotaryEncoder add-on library must be enabled to read the
-% encoder, so it is requested explicitly here (bare arduino() won't have it).
-% Change 'COM5' if the board enumerates on a different port.
-a = arduino('COM5', 'Mega2560', 'Libraries', 'rotaryEncoder')
+a = arduino()
 
 % Encoder: 500-line quadrature on D2/D3, x4-decoded -> 2000 counts/motor-rev,
 % mounted on the MOTOR shaft before a 6.3:1 gearbox. So one OUTPUT-shaft
