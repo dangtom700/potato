@@ -42,3 +42,14 @@ build/                 # local build folder
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# ─────────────────────────────────────────────
+# Large media (bench photos / video) -- too big for git; store in cloud + link.
+# GitHub hard-blocks any file >100 MB, and binaries live in history forever.
+# (.png/.jpg are NOT ignored -- report figures and lab photos stay tracked.)
+# ─────────────────────────────────────────────
+media/
+*.mov
+*.MOV
+*.heic
+*.HEIC
