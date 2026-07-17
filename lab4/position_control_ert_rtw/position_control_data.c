@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'position_control'.
  *
- * Model version                  : 1.3
+ * Model version                  : 1.5
  * Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
- * C/C++ source code generated on : Fri Jul 17 11:20:43 2026
+ * C/C++ source code generated on : Fri Jul 17 13:14:09 2026
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -22,54 +22,68 @@
 /* Block parameters (default storage) */
 P_position_control_T position_control_P = {
   /* Mask Parameter: FilteredDerivativeDiscreteorCon
-   * Referenced by: '<S53>/[A,B]'
+   * Referenced by: '<S55>/[A,B]'
    */
   0.0,
 
   /* Mask Parameter: FilteredDerivativeDiscreteorC_p
-   * Referenced by: '<S53>/[A,B]'
+   * Referenced by: '<S55>/[A,B]'
    */
   0.0,
 
   /* Mask Parameter: DiscretePIDController_D
-   * Referenced by: '<S29>/Derivative Gain'
+   * Referenced by: '<S31>/Derivative Gain'
    */
   0.0016,
 
   /* Mask Parameter: DiscretePIDController_I
-   * Referenced by: '<S32>/Integral Gain'
+   * Referenced by: '<S34>/Integral Gain'
    */
   0.0,
 
   /* Mask Parameter: DiscretePIDController_InitialCo
-   * Referenced by: '<S30>/Filter'
+   * Referenced by: '<S32>/Filter'
    */
   0.0,
 
   /* Mask Parameter: DiscretePIDController_Initial_l
-   * Referenced by: '<S35>/Integrator'
+   * Referenced by: '<S37>/Integrator'
    */
   0.0,
 
   /* Mask Parameter: FilteredDerivativeDiscreteorC_i
-   * Referenced by: '<S53>/Gain'
+   * Referenced by: '<S55>/Gain'
    */
   1.0,
 
+  /* Mask Parameter: DiscretePIDController_LowerSatu
+   * Referenced by:
+   *   '<S44>/Saturation'
+   *   '<S30>/DeadZone'
+   */
+  -6.0,
+
   /* Mask Parameter: DiscretePIDController_N
-   * Referenced by: '<S38>/Filter Coefficient'
+   * Referenced by: '<S40>/Filter Coefficient'
    */
   100.0,
 
   /* Mask Parameter: DiscretePIDController_P
-   * Referenced by: '<S40>/Proportional Gain'
+   * Referenced by: '<S42>/Proportional Gain'
    */
   1.2237,
 
   /* Mask Parameter: FilteredDerivativeDiscreteorC_a
-   * Referenced by: '<S55>/Time constant'
+   * Referenced by: '<S57>/Time constant'
    */
   0.1,
+
+  /* Mask Parameter: DiscretePIDController_UpperSatu
+   * Referenced by:
+   *   '<S44>/Saturation'
+   *   '<S30>/DeadZone'
+   */
+  6.0,
 
   /* Mask Parameter: SliderGain_gain
    * Referenced by: '<S2>/Slider Gain'
@@ -77,42 +91,47 @@ P_position_control_T position_control_P = {
   3.0,
 
   /* Mask Parameter: FilteredDerivativeDiscreteorC_m
-   * Referenced by: '<S55>/Minimum sampling to time constant ratio'
+   * Referenced by: '<S57>/Minimum sampling to time constant ratio'
    */
   10.0,
 
   /* Expression: 0
-   * Referenced by: '<S52>/Constant'
+   * Referenced by: '<S28>/Constant1'
    */
   0.0,
 
   /* Expression: 0
-   * Referenced by: '<S53>/Constant'
+   * Referenced by: '<S54>/Constant'
+   */
+  0.0,
+
+  /* Expression: 0
+   * Referenced by: '<S55>/Constant'
    */
   0.0,
 
   /* Computed Parameter: Integrator_gainval
-   * Referenced by: '<S59>/Integrator'
+   * Referenced by: '<S61>/Integrator'
    */
   0.01,
 
   /* Expression: antiwindupUpperLimit
-   * Referenced by: '<S59>/Integrator'
+   * Referenced by: '<S61>/Integrator'
    */
   0.0,
 
   /* Expression: antiwindupLowerLimit
-   * Referenced by: '<S59>/Integrator'
+   * Referenced by: '<S61>/Integrator'
    */
   0.0,
 
   /* Expression: windupUpperLimit
-   * Referenced by: '<S59>/Saturation'
+   * Referenced by: '<S61>/Saturation'
    */
   0.0,
 
   /* Expression: windupLowerLimit
-   * Referenced by: '<S59>/Saturation'
+   * Referenced by: '<S61>/Saturation'
    */
   0.0,
 
@@ -166,13 +185,13 @@ P_position_control_T position_control_P = {
    */
   0.0,
 
-  /* Computed Parameter: Filter_gainval
-   * Referenced by: '<S30>/Filter'
+  /* Computed Parameter: Integrator_gainval_l
+   * Referenced by: '<S37>/Integrator'
    */
   0.01,
 
-  /* Computed Parameter: Integrator_gainval_l
-   * Referenced by: '<S35>/Integrator'
+  /* Computed Parameter: Filter_gainval
+   * Referenced by: '<S32>/Filter'
    */
   0.01,
 
@@ -191,10 +210,35 @@ P_position_control_T position_control_P = {
    */
   21.25,
 
+  /* Expression: 0
+   * Referenced by: '<S28>/Clamping_zero'
+   */
+  0.0,
+
+  /* Computed Parameter: Constant_Value_l
+   * Referenced by: '<S28>/Constant'
+   */
+  1,
+
+  /* Computed Parameter: Constant2_Value
+   * Referenced by: '<S28>/Constant2'
+   */
+  -1,
+
+  /* Computed Parameter: Constant3_Value
+   * Referenced by: '<S28>/Constant3'
+   */
+  1,
+
+  /* Computed Parameter: Constant4_Value
+   * Referenced by: '<S28>/Constant4'
+   */
+  -1,
+
   /* Computed Parameter: ManualSwitch_CurrentSetting
    * Referenced by: '<Root>/Manual Switch'
    */
-  0U,
+  1U,
 
   /* Computed Parameter: ManualSwitch1_CurrentSetting
    * Referenced by: '<Root>/Manual Switch1'
@@ -204,7 +248,7 @@ P_position_control_T position_control_P = {
   /* Computed Parameter: ManualSwitch2_CurrentSetting
    * Referenced by: '<Root>/Manual Switch2'
    */
-  0U
+  1U
 };
 
 /*

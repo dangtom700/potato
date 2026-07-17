@@ -7,9 +7,9 @@
  *
  * Code generation for model "velocity_control".
  *
- * Model version              : 1.2
+ * Model version              : 1.7
  * Simulink Coder version : 9.9 (R2023a) 19-Nov-2022
- * C source code generated on : Fri Jul 17 11:15:16 2026
+ * C source code generated on : Fri Jul 17 13:08:40 2026
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR

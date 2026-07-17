@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'velocity_control'.
  *
- * Model version                  : 1.2
+ * Model version                  : 1.7
  * Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
- * C/C++ source code generated on : Fri Jul 17 11:15:16 2026
+ * C/C++ source code generated on : Fri Jul 17 13:08:40 2026
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -85,6 +85,8 @@ typedef struct {
   real_T AB;                           /* '<S53>/[A,B]' */
   real_T Mod;                          /* '<S3>/Mod' */
   real_T SliderGain;                   /* '<S2>/Slider Gain' */
+  real_T Sum;                          /* '<Root>/Sum' */
+  real_T Saturation_n;                 /* '<S42>/Saturation' */
 } B_velocity_control_T;
 
 /* Block states (default storage) for system '<Root>' */
@@ -93,10 +95,10 @@ typedef struct {
   Encoder_arduino_velocity_cont_T obj_j;/* '<S3>/M1V4 Middle Connector 2,3' */
   codertarget_arduinobase_inter_T obj_l;/* '<S3>/PWM' */
   real_T Integrator_DSTATE;            /* '<S59>/Integrator' */
-  real_T Filter_DSTATE;                /* '<S30>/Filter' */
   real_T Integrator_DSTATE_c;          /* '<S35>/Integrator' */
+  real_T Filter_DSTATE;                /* '<S30>/Filter' */
   struct {
-    void *LoggedData[3];
+    void *LoggedData[5];
   } Scope_PWORK;                       /* '<Root>/Scope' */
 
   int8_T Integrator_PrevResetState;    /* '<S59>/Integrator' */
@@ -133,6 +135,10 @@ struct P_velocity_control_T_ {
                               /* Mask Parameter: FilteredDerivativeDiscreteorC_i
                                * Referenced by: '<S53>/Gain'
                                */
+  real_T DiscretePIDController_LowerSatu;
+                              /* Mask Parameter: DiscretePIDController_LowerSatu
+                               * Referenced by: '<S42>/Saturation'
+                               */
   real_T DiscretePIDController_N;     /* Mask Parameter: DiscretePIDController_N
                                        * Referenced by: '<S38>/Filter Coefficient'
                                        */
@@ -142,6 +148,10 @@ struct P_velocity_control_T_ {
   real_T FilteredDerivativeDiscreteorC_a;
                               /* Mask Parameter: FilteredDerivativeDiscreteorC_a
                                * Referenced by: '<S55>/Time constant'
+                               */
+  real_T DiscretePIDController_UpperSatu;
+                              /* Mask Parameter: DiscretePIDController_UpperSatu
+                               * Referenced by: '<S42>/Saturation'
                                */
   real_T SliderGain_gain;              /* Mask Parameter: SliderGain_gain
                                         * Referenced by: '<S2>/Slider Gain'
@@ -197,12 +207,12 @@ struct P_velocity_control_T_ {
                               /* Computed Parameter: SawtoothGenerator_Frequency
                                * Referenced by: '<Root>/Sawtooth Generator'
                                */
-  real_T Filter_gainval;               /* Computed Parameter: Filter_gainval
-                                        * Referenced by: '<S30>/Filter'
-                                        */
   real_T Integrator_gainval_l;       /* Computed Parameter: Integrator_gainval_l
                                       * Referenced by: '<S35>/Integrator'
                                       */
+  real_T Filter_gainval;               /* Computed Parameter: Filter_gainval
+                                        * Referenced by: '<S30>/Filter'
+                                        */
   real_T Saturation_UpperSat_j;        /* Expression: 6
                                         * Referenced by: '<S3>/Saturation'
                                         */
@@ -343,7 +353,7 @@ extern volatile boolean_T runModel;
  * '<S39>'  : 'velocity_control/Discrete PID Controller/P Copy/Disabled'
  * '<S40>'  : 'velocity_control/Discrete PID Controller/Parallel P Gain/Internal Parameters'
  * '<S41>'  : 'velocity_control/Discrete PID Controller/Reset Signal/Disabled'
- * '<S42>'  : 'velocity_control/Discrete PID Controller/Saturation/Passthrough'
+ * '<S42>'  : 'velocity_control/Discrete PID Controller/Saturation/Enabled'
  * '<S43>'  : 'velocity_control/Discrete PID Controller/Saturation Fdbk/Disabled'
  * '<S44>'  : 'velocity_control/Discrete PID Controller/Sum/Sum_PID'
  * '<S45>'  : 'velocity_control/Discrete PID Controller/Sum Fdbk/Disabled'

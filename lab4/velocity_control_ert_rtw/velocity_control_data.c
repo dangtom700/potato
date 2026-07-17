@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'velocity_control'.
  *
- * Model version                  : 1.2
+ * Model version                  : 1.7
  * Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
- * C/C++ source code generated on : Fri Jul 17 11:15:16 2026
+ * C/C++ source code generated on : Fri Jul 17 13:08:40 2026
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -56,6 +56,11 @@ P_velocity_control_T velocity_control_P = {
    */
   1.0,
 
+  /* Mask Parameter: DiscretePIDController_LowerSatu
+   * Referenced by: '<S42>/Saturation'
+   */
+  -6.0,
+
   /* Mask Parameter: DiscretePIDController_N
    * Referenced by: '<S38>/Filter Coefficient'
    */
@@ -71,10 +76,15 @@ P_velocity_control_T velocity_control_P = {
    */
   0.1,
 
+  /* Mask Parameter: DiscretePIDController_UpperSatu
+   * Referenced by: '<S42>/Saturation'
+   */
+  6.0,
+
   /* Mask Parameter: SliderGain_gain
    * Referenced by: '<S2>/Slider Gain'
    */
-  12.0,
+  27.6,
 
   /* Mask Parameter: FilteredDerivativeDiscreteorC_m
    * Referenced by: '<S55>/Minimum sampling to time constant ratio'
@@ -156,13 +166,13 @@ P_velocity_control_T velocity_control_P = {
    */
   0.15915494309189535,
 
-  /* Computed Parameter: Filter_gainval
-   * Referenced by: '<S30>/Filter'
+  /* Computed Parameter: Integrator_gainval_l
+   * Referenced by: '<S35>/Integrator'
    */
   0.01,
 
-  /* Computed Parameter: Integrator_gainval_l
-   * Referenced by: '<S35>/Integrator'
+  /* Computed Parameter: Filter_gainval
+   * Referenced by: '<S30>/Filter'
    */
   0.01,
 
@@ -184,7 +194,7 @@ P_velocity_control_T velocity_control_P = {
   /* Computed Parameter: ManualSwitch_CurrentSetting
    * Referenced by: '<Root>/Manual Switch'
    */
-  0U,
+  1U,
 
   /* Computed Parameter: ManualSwitch1_CurrentSetting
    * Referenced by: '<Root>/Manual Switch1'

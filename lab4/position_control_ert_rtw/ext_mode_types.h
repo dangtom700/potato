@@ -7,9 +7,9 @@
  *
  * Code generation for model "position_control".
  *
- * Model version              : 1.3
+ * Model version              : 1.5
  * Simulink Coder version : 9.9 (R2023a) 19-Nov-2022
- * C source code generated on : Fri Jul 17 11:20:43 2026
+ * C source code generated on : Fri Jul 17 13:14:09 2026
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR

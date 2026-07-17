@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'velocity_control'.
  *
- * Model version                  : 1.2
+ * Model version                  : 1.7
  * Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
- * C/C++ source code generated on : Fri Jul 17 11:15:16 2026
+ * C/C++ source code generated on : Fri Jul 17 13:08:40 2026
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -188,7 +188,6 @@ void velocity_control_step(void)
   }
 
   /* End of Saturate: '<S53>/[A,B]' */
-
   /* Math: '<S3>/Mod' incorporates:
    *  Constant: '<S3>/Constant1'
    */
@@ -246,30 +245,52 @@ void velocity_control_step(void)
   velocity_control_B.SliderGain = velocity_control_P.SliderGain_gain * angle;
 
   /* Sum: '<Root>/Sum' */
-  angle = velocity_control_B.SliderGain - velocity_control_B.AB;
+  velocity_control_B.Sum = velocity_control_B.SliderGain - velocity_control_B.AB;
 
   /* Gain: '<S38>/Filter Coefficient' incorporates:
    *  DiscreteIntegrator: '<S30>/Filter'
    *  Gain: '<S29>/Derivative Gain'
    *  Sum: '<S30>/SumD'
    */
-  rtb_FilterCoefficient = (velocity_control_P.DiscretePIDController_D * angle -
-    velocity_control_DW.Filter_DSTATE) *
+  rtb_FilterCoefficient = (velocity_control_P.DiscretePIDController_D *
+    velocity_control_B.Sum - velocity_control_DW.Filter_DSTATE) *
     velocity_control_P.DiscretePIDController_N;
 
   /* Sum: '<S44>/Sum' incorporates:
    *  DiscreteIntegrator: '<S35>/Integrator'
    *  Gain: '<S40>/Proportional Gain'
    */
-  rtb_Integrator_c = (velocity_control_P.DiscretePIDController_P * angle +
-                      velocity_control_DW.Integrator_DSTATE_c) +
+  velocity_control_B.Saturation_n = (velocity_control_P.DiscretePIDController_P *
+    velocity_control_B.Sum + velocity_control_DW.Integrator_DSTATE_c) +
     rtb_FilterCoefficient;
 
+  /* Saturate: '<S42>/Saturation' */
+  if (velocity_control_B.Saturation_n >
+      velocity_control_P.DiscretePIDController_UpperSatu) {
+    /* Sum: '<S44>/Sum' incorporates:
+     *  Saturate: '<S42>/Saturation'
+     */
+    velocity_control_B.Saturation_n =
+      velocity_control_P.DiscretePIDController_UpperSatu;
+  } else if (velocity_control_B.Saturation_n <
+             velocity_control_P.DiscretePIDController_LowerSatu) {
+    /* Sum: '<S44>/Sum' incorporates:
+     *  Saturate: '<S42>/Saturation'
+     */
+    velocity_control_B.Saturation_n =
+      velocity_control_P.DiscretePIDController_LowerSatu;
+  }
+
+  /* End of Saturate: '<S42>/Saturation' */
   /* Saturate: '<S3>/Saturation' */
-  if (rtb_Integrator_c > velocity_control_P.Saturation_UpperSat_j) {
-    rtb_Integrator_c = velocity_control_P.Saturation_UpperSat_j;
-  } else if (rtb_Integrator_c < velocity_control_P.Saturation_LowerSat_h) {
-    rtb_Integrator_c = velocity_control_P.Saturation_LowerSat_h;
+  if (velocity_control_B.Saturation_n > velocity_control_P.Saturation_UpperSat_j)
+  {
+    angle = velocity_control_P.Saturation_UpperSat_j;
+  } else if (velocity_control_B.Saturation_n <
+             velocity_control_P.Saturation_LowerSat_h) {
+    angle = velocity_control_P.Saturation_LowerSat_h;
+  } else {
+    angle = velocity_control_B.Saturation_n;
   }
 
   /* End of Saturate: '<S3>/Saturation' */
@@ -278,8 +299,7 @@ void velocity_control_step(void)
    *  Constant: '<S52>/Constant'
    *  RelationalOperator: '<S52>/Compare'
    */
-  writeDigitalPin(8, (uint8_T)(rtb_Integrator_c >
-    velocity_control_P.Constant_Value));
+  writeDigitalPin(8, (uint8_T)(angle > velocity_control_P.Constant_Value));
 
   /* MATLABSystem: '<S3>/PWM' */
   obj = &velocity_control_DW.obj_l;
@@ -288,22 +308,23 @@ void velocity_control_step(void)
   /* Gain: '<S3>/Gain1' incorporates:
    *  Abs: '<S3>/Abs'
    */
-  rtb_Integrator_c = velocity_control_P.Gain1_Gain * fabs(rtb_Integrator_c);
+  angle = velocity_control_P.Gain1_Gain * fabs(angle);
 
   /* MATLABSystem: '<S3>/PWM' */
-  if (!(rtb_Integrator_c <= 255.0)) {
-    rtb_Integrator_c = 255.0;
+  if (!(angle <= 255.0)) {
+    angle = 255.0;
   }
 
-  if (!(rtb_Integrator_c >= 0.0)) {
-    rtb_Integrator_c = 0.0;
+  if (!(angle >= 0.0)) {
+    angle = 0.0;
   }
 
   MW_PWM_SetDutyCycle(velocity_control_DW.obj_l.PWMDriverObj.MW_PWM_HANDLE,
-                      rtb_Integrator_c);
+                      angle);
 
   /* Gain: '<S32>/Integral Gain' */
-  rtb_IntegralGain = velocity_control_P.DiscretePIDController_I * angle;
+  rtb_IntegralGain = velocity_control_P.DiscretePIDController_I *
+    velocity_control_B.Sum;
 
   /* Update for DiscreteIntegrator: '<S59>/Integrator' incorporates:
    *  Constant: '<S53>/Constant'
@@ -333,13 +354,13 @@ void velocity_control_step(void)
 
   /* End of Update for DiscreteIntegrator: '<S59>/Integrator' */
 
-  /* Update for DiscreteIntegrator: '<S30>/Filter' */
-  velocity_control_DW.Filter_DSTATE += velocity_control_P.Filter_gainval *
-    rtb_FilterCoefficient;
-
   /* Update for DiscreteIntegrator: '<S35>/Integrator' */
   velocity_control_DW.Integrator_DSTATE_c +=
     velocity_control_P.Integrator_gainval_l * rtb_IntegralGain;
+
+  /* Update for DiscreteIntegrator: '<S30>/Filter' */
+  velocity_control_DW.Filter_DSTATE += velocity_control_P.Filter_gainval *
+    rtb_FilterCoefficient;
 
   {                                    /* Sample time: [0.0s, 0.0s] */
     extmodeErrorCode_T errorCode = EXTMODE_SUCCESS;
@@ -425,10 +446,10 @@ void velocity_control_initialize(void)
   velocity_control_M->Timing.stepSize0 = 0.01;
 
   /* External mode info */
-  velocity_control_M->Sizes.checksums[0] = (1448651599U);
-  velocity_control_M->Sizes.checksums[1] = (1199615748U);
-  velocity_control_M->Sizes.checksums[2] = (1377279271U);
-  velocity_control_M->Sizes.checksums[3] = (2187000315U);
+  velocity_control_M->Sizes.checksums[0] = (227866837U);
+  velocity_control_M->Sizes.checksums[1] = (1514004273U);
+  velocity_control_M->Sizes.checksums[2] = (3039173455U);
+  velocity_control_M->Sizes.checksums[3] = (3237608998U);
 
   {
     static const sysRanDType rtAlwaysEnabled = SUBSYS_RAN_BC_ENABLE;
@@ -460,13 +481,13 @@ void velocity_control_initialize(void)
     /* InitializeConditions for DiscreteIntegrator: '<S59>/Integrator' */
     velocity_control_DW.Integrator_IC_LOADING = 1U;
 
-    /* InitializeConditions for DiscreteIntegrator: '<S30>/Filter' */
-    velocity_control_DW.Filter_DSTATE =
-      velocity_control_P.DiscretePIDController_InitialCo;
-
     /* InitializeConditions for DiscreteIntegrator: '<S35>/Integrator' */
     velocity_control_DW.Integrator_DSTATE_c =
       velocity_control_P.DiscretePIDController_Initial_l;
+
+    /* InitializeConditions for DiscreteIntegrator: '<S30>/Filter' */
+    velocity_control_DW.Filter_DSTATE =
+      velocity_control_P.DiscretePIDController_InitialCo;
 
     /* Start for MATLABSystem: '<S3>/M1V4 Middle Connector 2,3' */
     /*  Constructor */

@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'position_control'.
  *
- * Model version                  : 1.3
+ * Model version                  : 1.5
  * Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
- * C/C++ source code generated on : Fri Jul 17 11:20:43 2026
+ * C/C++ source code generated on : Fri Jul 17 13:14:09 2026
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -80,12 +80,14 @@
 
 /* Block signals (default storage) */
 typedef struct {
-  real_T Probe[2];                     /* '<S55>/Probe' */
-  real_T uT;                           /* '<S53>/1//T' */
-  real_T AB;                           /* '<S53>/[A,B]' */
+  real_T Probe[2];                     /* '<S57>/Probe' */
+  real_T uT;                           /* '<S55>/1//T' */
+  real_T AB;                           /* '<S55>/[A,B]' */
   real_T Mod;                          /* '<S3>/Mod' */
   real_T SliderGain;                   /* '<S2>/Slider Gain' */
   real_T DiscreteTimeIntegrator;       /* '<Root>/Discrete-Time Integrator' */
+  real_T Sum;                          /* '<Root>/Sum' */
+  real_T Saturation_n;                 /* '<S44>/Saturation' */
 } B_position_control_T;
 
 /* Block states (default storage) for system '<Root>' */
@@ -93,16 +95,16 @@ typedef struct {
   codertarget_arduinobase_block_T obj; /* '<S3>/Digital Output' */
   Encoder_arduino_position_cont_T obj_j;/* '<S3>/M1V4 Middle Connector 2,3' */
   codertarget_arduinobase_inter_T obj_l;/* '<S3>/PWM' */
-  real_T Integrator_DSTATE;            /* '<S59>/Integrator' */
+  real_T Integrator_DSTATE;            /* '<S61>/Integrator' */
   real_T DiscreteTimeIntegrator_DSTATE;/* '<Root>/Discrete-Time Integrator' */
-  real_T Filter_DSTATE;                /* '<S30>/Filter' */
-  real_T Integrator_DSTATE_c;          /* '<S35>/Integrator' */
+  real_T Integrator_DSTATE_c;          /* '<S37>/Integrator' */
+  real_T Filter_DSTATE;                /* '<S32>/Filter' */
   struct {
-    void *LoggedData[4];
+    void *LoggedData[6];
   } Scope_PWORK;                       /* '<Root>/Scope' */
 
-  int8_T Integrator_PrevResetState;    /* '<S59>/Integrator' */
-  uint8_T Integrator_IC_LOADING;       /* '<S59>/Integrator' */
+  int8_T Integrator_PrevResetState;    /* '<S61>/Integrator' */
+  uint8_T Integrator_IC_LOADING;       /* '<S61>/Integrator' */
   uint8_T is_active_c2_position_control;/* '<S3>/MATLAB Function' */
   boolean_T doneDoubleBufferReInit;    /* '<S3>/MATLAB Function' */
 } DW_position_control_T;
@@ -111,69 +113,84 @@ typedef struct {
 struct P_position_control_T_ {
   real_T FilteredDerivativeDiscreteorCon;
                               /* Mask Parameter: FilteredDerivativeDiscreteorCon
-                               * Referenced by: '<S53>/[A,B]'
+                               * Referenced by: '<S55>/[A,B]'
                                */
   real_T FilteredDerivativeDiscreteorC_p;
                               /* Mask Parameter: FilteredDerivativeDiscreteorC_p
-                               * Referenced by: '<S53>/[A,B]'
+                               * Referenced by: '<S55>/[A,B]'
                                */
   real_T DiscretePIDController_D;     /* Mask Parameter: DiscretePIDController_D
-                                       * Referenced by: '<S29>/Derivative Gain'
+                                       * Referenced by: '<S31>/Derivative Gain'
                                        */
   real_T DiscretePIDController_I;     /* Mask Parameter: DiscretePIDController_I
-                                       * Referenced by: '<S32>/Integral Gain'
+                                       * Referenced by: '<S34>/Integral Gain'
                                        */
   real_T DiscretePIDController_InitialCo;
                               /* Mask Parameter: DiscretePIDController_InitialCo
-                               * Referenced by: '<S30>/Filter'
+                               * Referenced by: '<S32>/Filter'
                                */
   real_T DiscretePIDController_Initial_l;
                               /* Mask Parameter: DiscretePIDController_Initial_l
-                               * Referenced by: '<S35>/Integrator'
+                               * Referenced by: '<S37>/Integrator'
                                */
   real_T FilteredDerivativeDiscreteorC_i;
                               /* Mask Parameter: FilteredDerivativeDiscreteorC_i
-                               * Referenced by: '<S53>/Gain'
+                               * Referenced by: '<S55>/Gain'
+                               */
+  real_T DiscretePIDController_LowerSatu;
+                              /* Mask Parameter: DiscretePIDController_LowerSatu
+                               * Referenced by:
+                               *   '<S44>/Saturation'
+                               *   '<S30>/DeadZone'
                                */
   real_T DiscretePIDController_N;     /* Mask Parameter: DiscretePIDController_N
-                                       * Referenced by: '<S38>/Filter Coefficient'
+                                       * Referenced by: '<S40>/Filter Coefficient'
                                        */
   real_T DiscretePIDController_P;     /* Mask Parameter: DiscretePIDController_P
-                                       * Referenced by: '<S40>/Proportional Gain'
+                                       * Referenced by: '<S42>/Proportional Gain'
                                        */
   real_T FilteredDerivativeDiscreteorC_a;
                               /* Mask Parameter: FilteredDerivativeDiscreteorC_a
-                               * Referenced by: '<S55>/Time constant'
+                               * Referenced by: '<S57>/Time constant'
+                               */
+  real_T DiscretePIDController_UpperSatu;
+                              /* Mask Parameter: DiscretePIDController_UpperSatu
+                               * Referenced by:
+                               *   '<S44>/Saturation'
+                               *   '<S30>/DeadZone'
                                */
   real_T SliderGain_gain;              /* Mask Parameter: SliderGain_gain
                                         * Referenced by: '<S2>/Slider Gain'
                                         */
   real_T FilteredDerivativeDiscreteorC_m;
                               /* Mask Parameter: FilteredDerivativeDiscreteorC_m
-                               * Referenced by: '<S55>/Minimum sampling to time constant ratio'
+                               * Referenced by: '<S57>/Minimum sampling to time constant ratio'
                                */
+  real_T Constant1_Value;              /* Expression: 0
+                                        * Referenced by: '<S28>/Constant1'
+                                        */
   real_T Constant_Value;               /* Expression: 0
-                                        * Referenced by: '<S52>/Constant'
+                                        * Referenced by: '<S54>/Constant'
                                         */
   real_T Constant_Value_h;             /* Expression: 0
-                                        * Referenced by: '<S53>/Constant'
+                                        * Referenced by: '<S55>/Constant'
                                         */
   real_T Integrator_gainval;           /* Computed Parameter: Integrator_gainval
-                                        * Referenced by: '<S59>/Integrator'
+                                        * Referenced by: '<S61>/Integrator'
                                         */
   real_T Integrator_UpperSat;          /* Expression: antiwindupUpperLimit
-                                        * Referenced by: '<S59>/Integrator'
+                                        * Referenced by: '<S61>/Integrator'
                                         */
   real_T Integrator_LowerSat;          /* Expression: antiwindupLowerLimit
-                                        * Referenced by: '<S59>/Integrator'
+                                        * Referenced by: '<S61>/Integrator'
                                         */
   real_T Saturation_UpperSat;          /* Expression: windupUpperLimit
-                                        * Referenced by: '<S59>/Saturation'
+                                        * Referenced by: '<S61>/Saturation'
                                         */
   real_T Saturation_LowerSat;          /* Expression: windupLowerLimit
-                                        * Referenced by: '<S59>/Saturation'
+                                        * Referenced by: '<S61>/Saturation'
                                         */
-  real_T Constant1_Value;              /* Expression: pi
+  real_T Constant1_Value_g;            /* Expression: pi
                                         * Referenced by: '<S3>/Constant1'
                                         */
   real_T SignalGenerator_Amplitude;    /* Expression: 1
@@ -206,12 +223,12 @@ struct P_position_control_T_ {
   real_T DiscreteTimeIntegrator_IC;    /* Expression: 0
                                         * Referenced by: '<Root>/Discrete-Time Integrator'
                                         */
-  real_T Filter_gainval;               /* Computed Parameter: Filter_gainval
-                                        * Referenced by: '<S30>/Filter'
-                                        */
   real_T Integrator_gainval_l;       /* Computed Parameter: Integrator_gainval_l
-                                      * Referenced by: '<S35>/Integrator'
+                                      * Referenced by: '<S37>/Integrator'
                                       */
+  real_T Filter_gainval;               /* Computed Parameter: Filter_gainval
+                                        * Referenced by: '<S32>/Filter'
+                                        */
   real_T Saturation_UpperSat_j;        /* Expression: 6
                                         * Referenced by: '<S3>/Saturation'
                                         */
@@ -220,6 +237,21 @@ struct P_position_control_T_ {
                                         */
   real_T Gain1_Gain;                   /* Expression: 255/12
                                         * Referenced by: '<S3>/Gain1'
+                                        */
+  real_T Clamping_zero_Value;          /* Expression: 0
+                                        * Referenced by: '<S28>/Clamping_zero'
+                                        */
+  int8_T Constant_Value_l;             /* Computed Parameter: Constant_Value_l
+                                        * Referenced by: '<S28>/Constant'
+                                        */
+  int8_T Constant2_Value;              /* Computed Parameter: Constant2_Value
+                                        * Referenced by: '<S28>/Constant2'
+                                        */
+  int8_T Constant3_Value;              /* Computed Parameter: Constant3_Value
+                                        * Referenced by: '<S28>/Constant3'
+                                        */
+  int8_T Constant4_Value;              /* Computed Parameter: Constant4_Value
+                                        * Referenced by: '<S28>/Constant4'
                                         */
   uint8_T ManualSwitch_CurrentSetting;
                               /* Computed Parameter: ManualSwitch_CurrentSetting
@@ -338,38 +370,40 @@ extern volatile boolean_T runModel;
  * '<S25>'  : 'position_control/Discrete PID Controller/Tsamp - Ngain'
  * '<S26>'  : 'position_control/Discrete PID Controller/postSat Signal'
  * '<S27>'  : 'position_control/Discrete PID Controller/preSat Signal'
- * '<S28>'  : 'position_control/Discrete PID Controller/Anti-windup/Passthrough'
- * '<S29>'  : 'position_control/Discrete PID Controller/D Gain/Internal Parameters'
- * '<S30>'  : 'position_control/Discrete PID Controller/Filter/Disc. Forward Euler Filter'
- * '<S31>'  : 'position_control/Discrete PID Controller/Filter ICs/Internal IC - Filter'
- * '<S32>'  : 'position_control/Discrete PID Controller/I Gain/Internal Parameters'
- * '<S33>'  : 'position_control/Discrete PID Controller/Ideal P Gain/Passthrough'
- * '<S34>'  : 'position_control/Discrete PID Controller/Ideal P Gain Fdbk/Disabled'
- * '<S35>'  : 'position_control/Discrete PID Controller/Integrator/Discrete'
- * '<S36>'  : 'position_control/Discrete PID Controller/Integrator ICs/Internal IC'
- * '<S37>'  : 'position_control/Discrete PID Controller/N Copy/Disabled'
- * '<S38>'  : 'position_control/Discrete PID Controller/N Gain/Internal Parameters'
- * '<S39>'  : 'position_control/Discrete PID Controller/P Copy/Disabled'
- * '<S40>'  : 'position_control/Discrete PID Controller/Parallel P Gain/Internal Parameters'
- * '<S41>'  : 'position_control/Discrete PID Controller/Reset Signal/Disabled'
- * '<S42>'  : 'position_control/Discrete PID Controller/Saturation/Passthrough'
- * '<S43>'  : 'position_control/Discrete PID Controller/Saturation Fdbk/Disabled'
- * '<S44>'  : 'position_control/Discrete PID Controller/Sum/Sum_PID'
- * '<S45>'  : 'position_control/Discrete PID Controller/Sum Fdbk/Disabled'
- * '<S46>'  : 'position_control/Discrete PID Controller/Tracking Mode/Disabled'
- * '<S47>'  : 'position_control/Discrete PID Controller/Tracking Mode Sum/Passthrough'
- * '<S48>'  : 'position_control/Discrete PID Controller/Tsamp - Integral/TsSignalSpecification'
- * '<S49>'  : 'position_control/Discrete PID Controller/Tsamp - Ngain/Passthrough'
- * '<S50>'  : 'position_control/Discrete PID Controller/postSat Signal/Forward_Path'
- * '<S51>'  : 'position_control/Discrete PID Controller/preSat Signal/Forward_Path'
- * '<S52>'  : 'position_control/Subsystem/Compare To Zero'
- * '<S53>'  : 'position_control/Subsystem/Filtered Derivative (Discrete or Continuous)'
- * '<S54>'  : 'position_control/Subsystem/MATLAB Function'
- * '<S55>'  : 'position_control/Subsystem/Filtered Derivative (Discrete or Continuous)/Enable//disable time constant'
- * '<S56>'  : 'position_control/Subsystem/Filtered Derivative (Discrete or Continuous)/Initialization'
- * '<S57>'  : 'position_control/Subsystem/Filtered Derivative (Discrete or Continuous)/Integrator (Discrete or Continuous)'
- * '<S58>'  : 'position_control/Subsystem/Filtered Derivative (Discrete or Continuous)/Initialization/Init_u'
- * '<S59>'  : 'position_control/Subsystem/Filtered Derivative (Discrete or Continuous)/Integrator (Discrete or Continuous)/Discrete'
+ * '<S28>'  : 'position_control/Discrete PID Controller/Anti-windup/Disc. Clamping Parallel'
+ * '<S29>'  : 'position_control/Discrete PID Controller/Anti-windup/Disc. Clamping Parallel/Dead Zone'
+ * '<S30>'  : 'position_control/Discrete PID Controller/Anti-windup/Disc. Clamping Parallel/Dead Zone/Enabled'
+ * '<S31>'  : 'position_control/Discrete PID Controller/D Gain/Internal Parameters'
+ * '<S32>'  : 'position_control/Discrete PID Controller/Filter/Disc. Forward Euler Filter'
+ * '<S33>'  : 'position_control/Discrete PID Controller/Filter ICs/Internal IC - Filter'
+ * '<S34>'  : 'position_control/Discrete PID Controller/I Gain/Internal Parameters'
+ * '<S35>'  : 'position_control/Discrete PID Controller/Ideal P Gain/Passthrough'
+ * '<S36>'  : 'position_control/Discrete PID Controller/Ideal P Gain Fdbk/Disabled'
+ * '<S37>'  : 'position_control/Discrete PID Controller/Integrator/Discrete'
+ * '<S38>'  : 'position_control/Discrete PID Controller/Integrator ICs/Internal IC'
+ * '<S39>'  : 'position_control/Discrete PID Controller/N Copy/Disabled'
+ * '<S40>'  : 'position_control/Discrete PID Controller/N Gain/Internal Parameters'
+ * '<S41>'  : 'position_control/Discrete PID Controller/P Copy/Disabled'
+ * '<S42>'  : 'position_control/Discrete PID Controller/Parallel P Gain/Internal Parameters'
+ * '<S43>'  : 'position_control/Discrete PID Controller/Reset Signal/Disabled'
+ * '<S44>'  : 'position_control/Discrete PID Controller/Saturation/Enabled'
+ * '<S45>'  : 'position_control/Discrete PID Controller/Saturation Fdbk/Disabled'
+ * '<S46>'  : 'position_control/Discrete PID Controller/Sum/Sum_PID'
+ * '<S47>'  : 'position_control/Discrete PID Controller/Sum Fdbk/Disabled'
+ * '<S48>'  : 'position_control/Discrete PID Controller/Tracking Mode/Disabled'
+ * '<S49>'  : 'position_control/Discrete PID Controller/Tracking Mode Sum/Passthrough'
+ * '<S50>'  : 'position_control/Discrete PID Controller/Tsamp - Integral/TsSignalSpecification'
+ * '<S51>'  : 'position_control/Discrete PID Controller/Tsamp - Ngain/Passthrough'
+ * '<S52>'  : 'position_control/Discrete PID Controller/postSat Signal/Forward_Path'
+ * '<S53>'  : 'position_control/Discrete PID Controller/preSat Signal/Forward_Path'
+ * '<S54>'  : 'position_control/Subsystem/Compare To Zero'
+ * '<S55>'  : 'position_control/Subsystem/Filtered Derivative (Discrete or Continuous)'
+ * '<S56>'  : 'position_control/Subsystem/MATLAB Function'
+ * '<S57>'  : 'position_control/Subsystem/Filtered Derivative (Discrete or Continuous)/Enable//disable time constant'
+ * '<S58>'  : 'position_control/Subsystem/Filtered Derivative (Discrete or Continuous)/Initialization'
+ * '<S59>'  : 'position_control/Subsystem/Filtered Derivative (Discrete or Continuous)/Integrator (Discrete or Continuous)'
+ * '<S60>'  : 'position_control/Subsystem/Filtered Derivative (Discrete or Continuous)/Initialization/Init_u'
+ * '<S61>'  : 'position_control/Subsystem/Filtered Derivative (Discrete or Continuous)/Integrator (Discrete or Continuous)/Discrete'
  */
 #endif                                 /* RTW_HEADER_position_control_h_ */
 

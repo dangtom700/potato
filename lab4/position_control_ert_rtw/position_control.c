@@ -7,9 +7,9 @@
  *
  * Code generated for Simulink model 'position_control'.
  *
- * Model version                  : 1.3
+ * Model version                  : 1.5
  * Simulink Coder version         : 9.9 (R2023a) 19-Nov-2022
- * C/C++ source code generated on : Fri Jul 17 11:20:43 2026
+ * C/C++ source code generated on : Fri Jul 17 13:14:09 2026
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: Atmel->AVR
@@ -75,26 +75,28 @@ void position_control_step(void)
 {
   /* local block i/o variables */
   real_T rtb_FilterCoefficient;
-  real_T rtb_IntegralGain;
+  real_T rtb_Switch;
   codertarget_arduinobase_inter_T *obj;
   real_T angle;
   real_T rtb_Integrator_c;
   real_T temp;
   int32_T rtb_M1V4MiddleConnector23_0;
+  int8_T tmp;
+  int8_T tmp_0;
 
-  /* Gain: '<S55>/Minimum sampling to time constant ratio' */
+  /* Gain: '<S57>/Minimum sampling to time constant ratio' */
   rtb_Integrator_c = position_control_P.FilteredDerivativeDiscreteorC_m *
     position_control_B.Probe[0];
 
-  /* MinMax: '<S55>/MinMax' incorporates:
-   *  Constant: '<S55>/Time constant'
+  /* MinMax: '<S57>/MinMax' incorporates:
+   *  Constant: '<S57>/Time constant'
    */
   if ((!(rtb_Integrator_c >= position_control_P.FilteredDerivativeDiscreteorC_a))
       && (!rtIsNaN(position_control_P.FilteredDerivativeDiscreteorC_a))) {
     rtb_Integrator_c = position_control_P.FilteredDerivativeDiscreteorC_a;
   }
 
-  /* End of MinMax: '<S55>/MinMax' */
+  /* End of MinMax: '<S57>/MinMax' */
 
   /* MATLABSystem: '<S3>/M1V4 Middle Connector 2,3' */
   /*         %% Define output properties */
@@ -107,8 +109,8 @@ void position_control_step(void)
    */
   angle = (real_T)rtb_M1V4MiddleConnector23_0 * 0.00049866550056980839;
 
-  /* DiscreteIntegrator: '<S59>/Integrator' incorporates:
-   *  Constant: '<S53>/Constant'
+  /* DiscreteIntegrator: '<S61>/Integrator' incorporates:
+   *  Constant: '<S55>/Constant'
    */
   if (position_control_DW.Integrator_IC_LOADING != 0) {
     position_control_DW.Integrator_DSTATE = angle;
@@ -147,8 +149,8 @@ void position_control_step(void)
       position_control_P.Integrator_LowerSat;
   }
 
-  /* Saturate: '<S59>/Saturation' incorporates:
-   *  DiscreteIntegrator: '<S59>/Integrator'
+  /* Saturate: '<S61>/Saturation' incorporates:
+   *  DiscreteIntegrator: '<S61>/Integrator'
    */
   if (position_control_DW.Integrator_DSTATE >
       position_control_P.Saturation_UpperSat) {
@@ -160,39 +162,39 @@ void position_control_step(void)
     temp = position_control_DW.Integrator_DSTATE;
   }
 
-  /* Product: '<S53>/1//T' incorporates:
-   *  Fcn: '<S55>/Avoid Divide by Zero'
-   *  Saturate: '<S59>/Saturation'
-   *  Sum: '<S53>/Sum1'
+  /* Product: '<S55>/1//T' incorporates:
+   *  Fcn: '<S57>/Avoid Divide by Zero'
+   *  Saturate: '<S61>/Saturation'
+   *  Sum: '<S55>/Sum1'
    */
   position_control_B.uT = 1.0 / ((real_T)(rtb_Integrator_c == 0.0) *
     2.2204460492503131e-16 + rtb_Integrator_c) * (angle - temp);
 
-  /* Gain: '<S53>/Gain' */
+  /* Gain: '<S55>/Gain' */
   position_control_B.AB = position_control_P.FilteredDerivativeDiscreteorC_i *
     position_control_B.uT;
 
-  /* Saturate: '<S53>/[A,B]' */
+  /* Saturate: '<S55>/[A,B]' */
   if (position_control_B.AB > position_control_P.FilteredDerivativeDiscreteorC_p)
   {
-    /* Gain: '<S53>/Gain' incorporates:
-     *  Saturate: '<S53>/[A,B]'
+    /* Gain: '<S55>/Gain' incorporates:
+     *  Saturate: '<S55>/[A,B]'
      */
     position_control_B.AB = position_control_P.FilteredDerivativeDiscreteorC_p;
   } else if (position_control_B.AB <
              position_control_P.FilteredDerivativeDiscreteorCon) {
-    /* Gain: '<S53>/Gain' incorporates:
-     *  Saturate: '<S53>/[A,B]'
+    /* Gain: '<S55>/Gain' incorporates:
+     *  Saturate: '<S55>/[A,B]'
      */
     position_control_B.AB = position_control_P.FilteredDerivativeDiscreteorCon;
   }
 
-  /* End of Saturate: '<S53>/[A,B]' */
-
+  /* End of Saturate: '<S55>/[A,B]' */
   /* Math: '<S3>/Mod' incorporates:
    *  Constant: '<S3>/Constant1'
    */
-  position_control_B.Mod = rt_modd_snf(angle, position_control_P.Constant1_Value);
+  position_control_B.Mod = rt_modd_snf(angle,
+    position_control_P.Constant1_Value_g);
 
   /* SignalGenerator: '<Root>/Square Wave Generator' incorporates:
    *  SignalGenerator: '<Root>/Signal Generator'
@@ -250,41 +252,61 @@ void position_control_step(void)
     position_control_DW.DiscreteTimeIntegrator_DSTATE;
 
   /* Sum: '<Root>/Sum' */
-  angle = position_control_B.SliderGain -
+  position_control_B.Sum = position_control_B.SliderGain -
     position_control_B.DiscreteTimeIntegrator;
 
-  /* Gain: '<S38>/Filter Coefficient' incorporates:
-   *  DiscreteIntegrator: '<S30>/Filter'
-   *  Gain: '<S29>/Derivative Gain'
-   *  Sum: '<S30>/SumD'
+  /* Gain: '<S40>/Filter Coefficient' incorporates:
+   *  DiscreteIntegrator: '<S32>/Filter'
+   *  Gain: '<S31>/Derivative Gain'
+   *  Sum: '<S32>/SumD'
    */
-  rtb_FilterCoefficient = (position_control_P.DiscretePIDController_D * angle -
-    position_control_DW.Filter_DSTATE) *
+  rtb_FilterCoefficient = (position_control_P.DiscretePIDController_D *
+    position_control_B.Sum - position_control_DW.Filter_DSTATE) *
     position_control_P.DiscretePIDController_N;
 
-  /* Sum: '<S44>/Sum' incorporates:
-   *  DiscreteIntegrator: '<S35>/Integrator'
-   *  Gain: '<S40>/Proportional Gain'
+  /* Sum: '<S46>/Sum' incorporates:
+   *  DiscreteIntegrator: '<S37>/Integrator'
+   *  Gain: '<S42>/Proportional Gain'
    */
-  rtb_Integrator_c = (position_control_P.DiscretePIDController_P * angle +
-                      position_control_DW.Integrator_DSTATE_c) +
-    rtb_FilterCoefficient;
+  angle = (position_control_P.DiscretePIDController_P * position_control_B.Sum +
+           position_control_DW.Integrator_DSTATE_c) + rtb_FilterCoefficient;
 
+  /* Saturate: '<S44>/Saturation' */
+  if (angle > position_control_P.DiscretePIDController_UpperSatu) {
+    /* Saturate: '<S44>/Saturation' */
+    position_control_B.Saturation_n =
+      position_control_P.DiscretePIDController_UpperSatu;
+  } else if (angle < position_control_P.DiscretePIDController_LowerSatu) {
+    /* Saturate: '<S44>/Saturation' */
+    position_control_B.Saturation_n =
+      position_control_P.DiscretePIDController_LowerSatu;
+  } else {
+    /* Saturate: '<S44>/Saturation' */
+    position_control_B.Saturation_n = angle;
+  }
+
+  /* End of Saturate: '<S44>/Saturation' */
   /* Saturate: '<S3>/Saturation' */
-  if (rtb_Integrator_c > position_control_P.Saturation_UpperSat_j) {
-    rtb_Integrator_c = position_control_P.Saturation_UpperSat_j;
-  } else if (rtb_Integrator_c < position_control_P.Saturation_LowerSat_h) {
-    rtb_Integrator_c = position_control_P.Saturation_LowerSat_h;
+  if (position_control_B.Saturation_n > position_control_P.Saturation_UpperSat_j)
+  {
+    /* Gain: '<S34>/Integral Gain' */
+    rtb_Switch = position_control_P.Saturation_UpperSat_j;
+  } else if (position_control_B.Saturation_n <
+             position_control_P.Saturation_LowerSat_h) {
+    /* Gain: '<S34>/Integral Gain' */
+    rtb_Switch = position_control_P.Saturation_LowerSat_h;
+  } else {
+    /* Gain: '<S34>/Integral Gain' */
+    rtb_Switch = position_control_B.Saturation_n;
   }
 
   /* End of Saturate: '<S3>/Saturation' */
 
   /* MATLABSystem: '<S3>/Digital Output' incorporates:
-   *  Constant: '<S52>/Constant'
-   *  RelationalOperator: '<S52>/Compare'
+   *  Constant: '<S54>/Constant'
+   *  RelationalOperator: '<S54>/Compare'
    */
-  writeDigitalPin(8, (uint8_T)(rtb_Integrator_c >
-    position_control_P.Constant_Value));
+  writeDigitalPin(8, (uint8_T)(rtb_Switch > position_control_P.Constant_Value));
 
   /* MATLABSystem: '<S3>/PWM' */
   obj = &position_control_DW.obj_l;
@@ -293,7 +315,7 @@ void position_control_step(void)
   /* Gain: '<S3>/Gain1' incorporates:
    *  Abs: '<S3>/Abs'
    */
-  rtb_Integrator_c = position_control_P.Gain1_Gain * fabs(rtb_Integrator_c);
+  rtb_Integrator_c = position_control_P.Gain1_Gain * fabs(rtb_Switch);
 
   /* MATLABSystem: '<S3>/PWM' */
   if (!(rtb_Integrator_c <= 255.0)) {
@@ -307,11 +329,65 @@ void position_control_step(void)
   MW_PWM_SetDutyCycle(position_control_DW.obj_l.PWMDriverObj.MW_PWM_HANDLE,
                       rtb_Integrator_c);
 
-  /* Gain: '<S32>/Integral Gain' */
-  rtb_IntegralGain = position_control_P.DiscretePIDController_I * angle;
+  /* DeadZone: '<S30>/DeadZone' */
+  if (angle > position_control_P.DiscretePIDController_UpperSatu) {
+    angle -= position_control_P.DiscretePIDController_UpperSatu;
+  } else if (angle >= position_control_P.DiscretePIDController_LowerSatu) {
+    angle = 0.0;
+  } else {
+    angle -= position_control_P.DiscretePIDController_LowerSatu;
+  }
 
-  /* Update for DiscreteIntegrator: '<S59>/Integrator' incorporates:
-   *  Constant: '<S53>/Constant'
+  /* End of DeadZone: '<S30>/DeadZone' */
+
+  /* Gain: '<S34>/Integral Gain' */
+  rtb_Switch = position_control_P.DiscretePIDController_I *
+    position_control_B.Sum;
+
+  /* Switch: '<S28>/Switch1' incorporates:
+   *  Constant: '<S28>/Clamping_zero'
+   *  Constant: '<S28>/Constant'
+   *  Constant: '<S28>/Constant2'
+   *  RelationalOperator: '<S28>/fix for DT propagation issue'
+   */
+  if (angle > position_control_P.Clamping_zero_Value) {
+    tmp = position_control_P.Constant_Value_l;
+  } else {
+    tmp = position_control_P.Constant2_Value;
+  }
+
+  /* Switch: '<S28>/Switch2' incorporates:
+   *  Constant: '<S28>/Clamping_zero'
+   *  Constant: '<S28>/Constant3'
+   *  Constant: '<S28>/Constant4'
+   *  RelationalOperator: '<S28>/fix for DT propagation issue1'
+   */
+  if (rtb_Switch > position_control_P.Clamping_zero_Value) {
+    tmp_0 = position_control_P.Constant3_Value;
+  } else {
+    tmp_0 = position_control_P.Constant4_Value;
+  }
+
+  /* Switch: '<S28>/Switch' incorporates:
+   *  Constant: '<S28>/Clamping_zero'
+   *  Logic: '<S28>/AND3'
+   *  RelationalOperator: '<S28>/Equal1'
+   *  RelationalOperator: '<S28>/Relational Operator'
+   *  Switch: '<S28>/Switch1'
+   *  Switch: '<S28>/Switch2'
+   */
+  if ((position_control_P.Clamping_zero_Value != angle) && (tmp == tmp_0)) {
+    /* Gain: '<S34>/Integral Gain' incorporates:
+     *  Constant: '<S28>/Constant1'
+     *  Switch: '<S28>/Switch'
+     */
+    rtb_Switch = position_control_P.Constant1_Value;
+  }
+
+  /* End of Switch: '<S28>/Switch' */
+
+  /* Update for DiscreteIntegrator: '<S61>/Integrator' incorporates:
+   *  Constant: '<S55>/Constant'
    */
   position_control_DW.Integrator_IC_LOADING = 0U;
   position_control_DW.Integrator_DSTATE += position_control_P.Integrator_gainval
@@ -336,19 +412,19 @@ void position_control_step(void)
     position_control_DW.Integrator_PrevResetState = 2;
   }
 
-  /* End of Update for DiscreteIntegrator: '<S59>/Integrator' */
+  /* End of Update for DiscreteIntegrator: '<S61>/Integrator' */
 
   /* Update for DiscreteIntegrator: '<Root>/Discrete-Time Integrator' */
   position_control_DW.DiscreteTimeIntegrator_DSTATE +=
     position_control_P.DiscreteTimeIntegrator_gainval * position_control_B.AB;
 
-  /* Update for DiscreteIntegrator: '<S30>/Filter' */
+  /* Update for DiscreteIntegrator: '<S37>/Integrator' */
+  position_control_DW.Integrator_DSTATE_c +=
+    position_control_P.Integrator_gainval_l * rtb_Switch;
+
+  /* Update for DiscreteIntegrator: '<S32>/Filter' */
   position_control_DW.Filter_DSTATE += position_control_P.Filter_gainval *
     rtb_FilterCoefficient;
-
-  /* Update for DiscreteIntegrator: '<S35>/Integrator' */
-  position_control_DW.Integrator_DSTATE_c +=
-    position_control_P.Integrator_gainval_l * rtb_IntegralGain;
 
   {                                    /* Sample time: [0.0s, 0.0s] */
     extmodeErrorCode_T errorCode = EXTMODE_SUCCESS;
@@ -434,15 +510,15 @@ void position_control_initialize(void)
   position_control_M->Timing.stepSize0 = 0.01;
 
   /* External mode info */
-  position_control_M->Sizes.checksums[0] = (1511234986U);
-  position_control_M->Sizes.checksums[1] = (2755500957U);
-  position_control_M->Sizes.checksums[2] = (1323918060U);
-  position_control_M->Sizes.checksums[3] = (1033110301U);
+  position_control_M->Sizes.checksums[0] = (2992833657U);
+  position_control_M->Sizes.checksums[1] = (486786571U);
+  position_control_M->Sizes.checksums[2] = (2420211508U);
+  position_control_M->Sizes.checksums[3] = (169196995U);
 
   {
     static const sysRanDType rtAlwaysEnabled = SUBSYS_RAN_BC_ENABLE;
     static RTWExtModeInfo rt_ExtModeInfo;
-    static const sysRanDType *systemRan[7];
+    static const sysRanDType *systemRan[11];
     position_control_M->extModeInfo = (&rt_ExtModeInfo);
     rteiSetSubSystemActiveVectorAddresses(&rt_ExtModeInfo, systemRan);
     systemRan[0] = &rtAlwaysEnabled;
@@ -452,6 +528,10 @@ void position_control_initialize(void)
     systemRan[4] = &rtAlwaysEnabled;
     systemRan[5] = &rtAlwaysEnabled;
     systemRan[6] = &rtAlwaysEnabled;
+    systemRan[7] = &rtAlwaysEnabled;
+    systemRan[8] = &rtAlwaysEnabled;
+    systemRan[9] = &rtAlwaysEnabled;
+    systemRan[10] = &rtAlwaysEnabled;
     rteiSetModelMappingInfoPtr(position_control_M->extModeInfo,
       &position_control_M->SpecialInfo.mappingInfo);
     rteiSetChecksumsPtr(position_control_M->extModeInfo,
@@ -462,24 +542,24 @@ void position_control_initialize(void)
   {
     codertarget_arduinobase_inter_T *obj;
 
-    /* Start for Probe: '<S55>/Probe' */
+    /* Start for Probe: '<S57>/Probe' */
     position_control_B.Probe[0] = 0.01;
     position_control_B.Probe[1] = 0.0;
 
-    /* InitializeConditions for DiscreteIntegrator: '<S59>/Integrator' */
+    /* InitializeConditions for DiscreteIntegrator: '<S61>/Integrator' */
     position_control_DW.Integrator_IC_LOADING = 1U;
 
     /* InitializeConditions for DiscreteIntegrator: '<Root>/Discrete-Time Integrator' */
     position_control_DW.DiscreteTimeIntegrator_DSTATE =
       position_control_P.DiscreteTimeIntegrator_IC;
 
-    /* InitializeConditions for DiscreteIntegrator: '<S30>/Filter' */
-    position_control_DW.Filter_DSTATE =
-      position_control_P.DiscretePIDController_InitialCo;
-
-    /* InitializeConditions for DiscreteIntegrator: '<S35>/Integrator' */
+    /* InitializeConditions for DiscreteIntegrator: '<S37>/Integrator' */
     position_control_DW.Integrator_DSTATE_c =
       position_control_P.DiscretePIDController_Initial_l;
+
+    /* InitializeConditions for DiscreteIntegrator: '<S32>/Filter' */
+    position_control_DW.Filter_DSTATE =
+      position_control_P.DiscretePIDController_InitialCo;
 
     /* Start for MATLABSystem: '<S3>/M1V4 Middle Connector 2,3' */
     /*  Constructor */
