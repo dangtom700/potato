@@ -1,0 +1,5 @@
+ArduinoPinHandleMap.o: \
+ C:/ProgramData/MATLAB/SupportPackages/R2023a/toolbox/target/supportpackages/arduinobase/src/ArduinoPinHandleMap.cpp \
+ C:/Users/tsd7/Desktop/potato/velocity_control_ert_rtw/rtwtypes.h
+
+C:/Users/tsd7/Desktop/potato/velocity_control_ert_rtw/rtwtypes.h:

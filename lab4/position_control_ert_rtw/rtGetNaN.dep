@@ -1,0 +1,11 @@
+rtGetNaN.o: \
+ C:/Users/tsd7/Desktop/potato/position_control_ert_rtw/rtGetNaN.c \
+ C:/Users/tsd7/Desktop/potato/position_control_ert_rtw/rtwtypes.h \
+ C:/Users/tsd7/Desktop/potato/position_control_ert_rtw/rtGetNaN.h \
+ C:/Users/tsd7/Desktop/potato/position_control_ert_rtw/rt_nonfinite.h
+
+C:/Users/tsd7/Desktop/potato/position_control_ert_rtw/rtwtypes.h:
+
+C:/Users/tsd7/Desktop/potato/position_control_ert_rtw/rtGetNaN.h:
+
+C:/Users/tsd7/Desktop/potato/position_control_ert_rtw/rt_nonfinite.h:
