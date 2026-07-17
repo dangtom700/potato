@@ -1,15 +1,16 @@
 // ============================================================================
 //  MSE 312 -- Directional control firmware for Arduino Mega 2560
 // ----------------------------------------------------------------------------
-//  Drives a Toshiba TB6568KQ H-bridge. The SN7400 NAND board (which used to
-//  compute IN1 = PWM AND DIR1, IN2 = PWM AND DIR2 from a separate PWM pin) has
-//  been REMOVED: D12 and D13 now drive the two H-bridge inputs (IN1, IN2)
-//  DIRECTLY. Speed control is done by PWM'ing whichever direction pin is active
-//  (the other is held LOW); D9 is no longer used.
-//    forward : D12 = PWM(duty), D13 = LOW    (CW)
-//    reverse : D12 = LOW,       D13 = PWM(duty) (CCW)
-//    brake   : D12 = HIGH,      D13 = HIGH   (short brake, holds position)
-//    coast   : D12 = LOW,       D13 = LOW    (free spin)
+//  Drives a Toshiba TB6568KQ H-bridge THROUGH an SN7400 NAND board that folds one
+//  PWM line and one direction line into the two H-bridge inputs:
+//        IN1 = PWM AND DIR1        IN2 = PWM AND DIR2 (= PWM AND NOT DIR1)
+//  The firmware drives D9 = PWM (speed) and D8 = DIR (direction) into that board;
+//  it does NOT touch the H-bridge inputs directly. Behaviour by command:
+//    forward : D8 = HIGH, D9 = PWM(duty)   -> IN1 = PWM, IN2 = 0   (CW)
+//    reverse : D8 = LOW,  D9 = PWM(duty)   -> IN1 = 0,   IN2 = PWM (CCW)
+//    stop    : D9 = 0                       -> IN1 = IN2 = 0        (coast)
+//  NOTE: this single-DIR board CANNOT short-brake (it can never hold IN1=IN2
+//  HIGH), so a "brake"/|v|=0 command coasts (PWM off) instead of actively braking.
 //
 //  The v->(duty,DIR1,DIR2) mapping is unchanged (Simulink "slider gain +
 //  brake-at-zero"); only how those bits reach the pins changed. See applyDrive.
@@ -30,18 +31,16 @@
 // ---------------------------------------------------------------------------
 // Pin map (fixed by the already-soldered board -- do not change)
 // ---------------------------------------------------------------------------
-// D9 (old PWM pin) is now unused -- the NAND board is gone and D12/D13 drive
-// the H-bridge inputs directly, PWM'ing the active direction line themselves.
-// D12 = OC1B (Timer1), D13 = OC0A (Timer0); analogWrite() on each works without
-// disturbing millis()/micros().
-static const uint8_t PIN_DIR1  = 12;   // D12 -> IN1 (forward/CW line, PWM here)
-static const uint8_t PIN_DIR2  = 13;   // D13 -> IN2 (reverse/CCW line, PWM here)
+// The motor is driven through the SN7400 NAND board: D9 carries the PWM (speed)
+// and D8 the direction bit; the board combines them into the H-bridge inputs
+// IN1/IN2. D9 = OC2B (Timer2) for analogWrite PWM; D8 is a plain digital line.
+// Neither uses Timer0, so millis()/micros() and the 100 Hz loop are unaffected.
+static const uint8_t PIN_PWM   = 9;    // D9 -> NAND "PWM in"  (speed, ~490 Hz)
+static const uint8_t PIN_DIR   = 8;    // D8 -> NAND "DIR in"  (direction bit)
 static const uint8_t PIN_ENC_A = 2;    // D2  -> encoder A (INT4)  yellow
 static const uint8_t PIN_ENC_B = 3;    // D3  -> encoder B (INT5)  blue
-// D11 = OC1A, the SAME timer (Timer1) as the motor's D12 = OC1B. analogWrite on
-// each is an independent duty on a shared ~490 Hz base, so dimming the LED does
-// not disturb the motor PWM (and neither touches Timer0 / millis()). LED anode
-// -> D11 through a series resistor, cathode -> GND.
+// D11 = OC1A (Timer1); independent of the D9 PWM (Timer2) and of Timer0/millis().
+// LED anode -> D11 through a series resistor, cathode -> GND.
 static const uint8_t PIN_LED   = 11;   // D11 -> indicator LED, dimmed by shaft angle
 
 // ---------------------------------------------------------------------------
@@ -102,50 +101,50 @@ static long readCount() {
 }
 
 // ===========================================================================
-//  Applying a command to the pins  (direct drive -- NAND board removed)
+//  Applying a command to the pins  (drive through the SN7400 NAND board)
 // ===========================================================================
 // Last-applied outputs (for telemetry).
 int  g_lastDuty = 0;
 bool g_lastDir1 = false;
 bool g_lastDir2 = false;
 
-// Map a DriveCmd onto the two H-bridge inputs now wired directly to D12/D13.
-// One direction pin carries the PWM (speed); the other is held LOW. Brake pulls
-// both HIGH, coast both LOW -- matching the TB6568KQ IN1/IN2 truth table:
-//   forward (dir1)      : D12 = PWM(duty), D13 = LOW           -> CW
-//   reverse (dir2)      : D12 = LOW,       D13 = PWM(duty)     -> CCW
-//   brake  (dir1&&dir2) : D12 = HIGH,      D13 = HIGH          -> short brake
-//   coast  (neither)    : D12 = LOW,       D13 = LOW           -> free spin
-// (computeDrive() still emits duty=255 for the brake case; it is unused here
-// since brake is produced by holding both inputs HIGH, not by the PWM level.)
+// Map a DriveCmd onto the NAND board's two inputs: D8 = direction, D9 = PWM. The
+// board turns (PWM, DIR) into IN1 = PWM AND DIR1, IN2 = PWM AND (NOT DIR1):
+//   forward (dir1)      : D8 = HIGH, D9 = PWM(duty)   -> IN1 = PWM, IN2 = 0  (CW)
+//   reverse (dir2)      : D8 = LOW,  D9 = PWM(duty)   -> IN1 = 0,   IN2 = PWM (CCW)
+//   brake  (dir1&&dir2) : D9 = 0     -> coast. This single-DIR board can't drive
+//                         IN1=IN2=HIGH, so "brake" from computeDrive (which also
+//                         sets duty=255) is applied as PWM off, i.e. free spin.
+//   coast  (neither)    : D9 = 0                      -> IN1 = IN2 = 0 (free spin)
 // analogWrite() special-cases 0 and 255 to clean digitalWrite LOW/HIGH, so full
-// speed and off give glitch-free static levels.
+// speed and off give glitch-free static levels. g_lastDuty logs the PWM ACTUALLY
+// applied (0 for brake/coast), while the dir bits still reflect the command so
+// the host can detect the brake state.
 static void applyDrive(const DriveCmd& c) {
-  if (c.dir1 && c.dir2) {              // ---- short brake (holds position) ----
-    digitalWrite(PIN_DIR1, HIGH);
-    digitalWrite(PIN_DIR2, HIGH);
+  int pwm;
+  if (c.dir1 && c.dir2) {              // ---- "brake" -> coast (board can't brake) ----
+    pwm = 0;
   } else if (c.dir1) {                 // ---- forward / CW ----
-    analogWrite(PIN_DIR1, c.duty);
-    digitalWrite(PIN_DIR2, LOW);
+    digitalWrite(PIN_DIR, HIGH);
+    pwm = c.duty;
   } else if (c.dir2) {                 // ---- reverse / CCW ----
-    digitalWrite(PIN_DIR1, LOW);
-    analogWrite(PIN_DIR2, c.duty);
+    digitalWrite(PIN_DIR, LOW);
+    pwm = c.duty;
   } else {                             // ---- coast / free spin ----
-    digitalWrite(PIN_DIR1, LOW);
-    digitalWrite(PIN_DIR2, LOW);
+    pwm = 0;
   }
-  g_lastDuty = c.duty;
+  analogWrite(PIN_PWM, pwm);
+  g_lastDuty = pwm;
   g_lastDir1 = c.dir1;
   g_lastDir2 = c.dir2;
 }
 
-// Coast / Hi-Z: both inputs LOW -> free spin.
+// Coast / Hi-Z: PWM off -> IN1 = IN2 = 0 -> free spin.
 // NOTE: coast is NOT part of the Simulink model (which never coasts); it is a
 // bench convenience exposed via the `stop` command and matches the TB6568KQ
 // datasheet "stop/coast" row.
 static void applyCoast() {
-  digitalWrite(PIN_DIR1, LOW);
-  digitalWrite(PIN_DIR2, LOW);
+  analogWrite(PIN_PWM, 0);
   g_lastDuty = 0;
   g_lastDir1 = false;
   g_lastDir2 = false;
@@ -419,10 +418,10 @@ void setup() {
   uint8_t resetCause = MCUSR;
   MCUSR = 0;
 
-  // Motor outputs: D12/D13 now drive the H-bridge inputs directly (each is
-  // PWM'd on its own timer by analogWrite when that direction is active).
-  pinMode(PIN_DIR1, OUTPUT);
-  pinMode(PIN_DIR2, OUTPUT);
+  // Motor outputs into the NAND board: D9 = PWM (speed), D8 = DIR (direction).
+  pinMode(PIN_PWM, OUTPUT);
+  pinMode(PIN_DIR, OUTPUT);
+  analogWrite(PIN_PWM, 0);            // motor off until commanded
 
   // Indicator LED (dimmed by shaft angle); start dark.
   pinMode(PIN_LED, OUTPUT);

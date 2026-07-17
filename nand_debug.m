@@ -63,7 +63,8 @@ addpath([fileparts(mfilename('fullpath')) '\RASPlib'],...
 % ==========================================================================
 %  1) SETTINGS  -- edit these, then just press Run
 % ==========================================================================
-PORT   = 'COM5';        % the board is on COM5 (close any serial monitor first)
+PORT   = 'COM5';        % Arduino USB port (arduino() auto-detects the Mega here).
+                        % Verify with serialportlist("available") if it moves.
 BOARD  = 'Mega2560';    % Arduino Mega 2560
 
 % --- Pin map (must match how you jumpered the NAND board) -----------------
