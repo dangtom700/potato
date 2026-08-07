@@ -1,4 +1,4 @@
-lear all; clc;
+clear all; clc;
 
 a = arduino()
 
