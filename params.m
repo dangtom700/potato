@@ -14,6 +14,11 @@ Ts          = 0.01;      % [s] fixed step -- match every block & the solver
 FIRE_DWELL  = 0.20;      % [s] solenoid one-shot pulse length
 DEBOUNCE_S  = 0.05;      % [s] IR-sensor debounce
 COMPRESS_TIMEOUT = 8.0;  % [s] abort COMPRESS if P_target never reached
+% derived tick counts for the Stateflow chart (discrete at Ts):
+DB_TICKS   = round(DEBOUNCE_S/Ts);        % IR debounce ticks
+FIRE_TICKS = round(FIRE_DWELL/Ts);        % solenoid one-shot ticks
+TO_TICKS   = round(COMPRESS_TIMEOUT/Ts);  % compress timeout ticks
+Pmargin    = 0.5;                          % [PSI] fire-on-the-fly lead (valve delay)
 
 %% ---------- pin map (documentation; set the same in each block dialog) ----------
 PIN_PWM   = 8;    % motor PWM  (D8)
@@ -21,8 +26,10 @@ PIN_DIR   = 7;    % motor direction (D7)
 PIN_FIRE  = 12;   % solenoid  (D12)
 PIN_IR1   = 22;   % ball sensor 1 -> WOODEN  (set to your wired pin)
 PIN_IR2   = 24;   % ball sensor 2 -> BOUNCY
-PIN_LED_WOOD   = 26;
-PIN_LED_BOUNCY = 28;
+% LED indicators are VIRTUAL (Dashboard Lamp in Simulink) -- no board wiring.
+% Only set these + route led_* to Digital Output if you add physical LEDs later.
+PIN_LED_WOOD   = 26;   % unused (virtual indicator)
+PIN_LED_BOUNCY = 28;   % unused (virtual indicator)
 ADC_PRESS = 2;    % analog A2
 
 %% ---------- pressure sensor ADC -> PSI (220 ohm sense) ----------
