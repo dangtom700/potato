@@ -91,3 +91,10 @@ Large bench media (a ~5-minute drive video plus photos) is kept out of git —
 GitHub blocks files over 100 MB — and lives in Google Drive:
 
 **https://drive.google.com/drive/folders/1SCe-OaLb3nAHqmevgox-py3BdQRYuB4O?usp=drive_link**
+
+## Related to finalBS.slx
+
+As the mechanical system was already not working for the motor that is given for the course, the solution before
+the mechanical system completely failed is to figure out the position of the crankshaft and hardcore to the
+position control module of the motor, given the time limit (promised of 3 days for calibration, but none in
+reality). The projected workflow is completed but nothing was put to test and bench the system's reponses.
